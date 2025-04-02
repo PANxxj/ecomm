@@ -76,7 +76,7 @@ const VendorLayout = ({ children }: VendorLayoutProps) => {
       {/* Mobile menu toggle button */}
       <div className="bg-white border-b md:hidden p-4 flex items-center justify-between">
         <Link to="/" className="text-xl font-bold text-primary">
-          Vendorific
+          Ecomm
         </Link>
         <Button
           variant="ghost"
@@ -101,7 +101,7 @@ const VendorLayout = ({ children }: VendorLayoutProps) => {
           {/* Brand/logo */}
           <div className="h-16 flex items-center px-4 border-b border-gray-200 hidden md:flex">
             <Link to="/" className="text-xl font-bold text-primary">
-              Vendorific
+              Ecomm
             </Link>
           </div>
           

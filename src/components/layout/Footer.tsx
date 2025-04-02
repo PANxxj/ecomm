@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* Company Info */}
           <div>
-            <h3 className="mb-4 text-lg font-bold">Vendorific</h3>
+            <h3 className="mb-4 text-lg font-bold">Ecomm</h3>
             <p className="mb-4 text-gray-600">
               Your trusted multi-vendor marketplace for quality products from verified sellers.
             </p>
@@ -92,7 +92,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="mt-12 border-t border-gray-200 pt-6 text-center">
           <p className="text-gray-600">
-            &copy; {currentYear} Vendorific. All rights reserved.
+            &copy; {currentYear} Ecomm. All rights reserved.
           </p>
         </div>
       </div>

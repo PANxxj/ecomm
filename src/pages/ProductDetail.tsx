@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import PageLayout from "@/components/layout/PageLayout";
 import { Button } from "@/components/ui/button";
@@ -8,43 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCart } from "@/contexts/CartContext";
 import { Minus, Plus, ShoppingCart, Star } from "lucide-react";
-
-// Mock product data
-const mockProducts = [
-  {
-    id: "1",
-    name: "Modern Desk Lamp",
-    description: "A stylish desk lamp with adjustable brightness perfect for any home office or study space. Features multiple brightness settings and a sleek, modern design that complements any decor.",
-    price: 49.99,
-    stock: 25,
-    image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&q=80&w=600&h=600",
-    category: "Home",
-    vendorId: "v1",
-    vendorName: "HomeGoods Inc.",
-    rating: 4.5,
-    reviews: [
-      { id: "r1", user: "Jane D.", rating: 5, comment: "Love this lamp! Perfect for my desk and the adjustable brightness is great for evening work." },
-      { id: "r2", user: "Michael S.", rating: 4, comment: "Good quality and looks nice. Wish it came in more colors." }
-    ]
-  },
-  {
-    id: "2",
-    name: "Wireless Headphones",
-    description: "Premium noise-cancelling wireless headphones providing crystal clear sound and comfort for all-day wear. Features Bluetooth 5.0 technology, 30-hour battery life, and soft ear cushions.",
-    price: 129.99,
-    stock: 10,
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=600&h=600",
-    category: "Electronics",
-    vendorId: "v2",
-    vendorName: "Tech World",
-    rating: 4.8,
-    reviews: [
-      { id: "r3", user: "Alex T.", rating: 5, comment: "Best headphones I've owned! Sound quality is amazing and they're so comfortable." },
-      { id: "r4", user: "Sarah P.", rating: 5, comment: "The noise cancellation is incredible, perfect for my daily commute." },
-      { id: "r5", user: "Mark J.", rating: 4, comment: "Great product, but the ear cups are a bit small for my ears." }
-    ]
-  }
-];
+import ProductApi from '../API/ProductApi'
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -52,7 +16,18 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   
   // Find product with matching ID
-  const product = mockProducts.find(p => p.id === id);
+  const [product,setProducts] = useState(null)
+  const getOrderList = async () => {
+      try {
+        const res = await ProductApi.getProduct(id);
+        setProducts(res.data.result);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    useEffect(() => {
+      getOrderList();
+    }, []);
   
   // Handle if product not found
   if (!product) {
@@ -87,14 +62,7 @@ const ProductDetail = () => {
   
   // Add to cart
   const handleAddToCart = () => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      vendorId: product.vendorId,
-      vendorName: product.vendorName
-    }, quantity);
+    addToCart(product, quantity);
   };
   
   return (
@@ -104,17 +72,17 @@ const ProductDetail = () => {
           {/* Product Image */}
           <div className="bg-white rounded-lg overflow-hidden shadow-sm">
             <img 
-              src={product.image} 
-              alt={product.name} 
+              src={product?.image} 
+              alt={product?.name} 
               className="w-full h-auto object-cover"
             />
           </div>
           
-          {/* Product Details */}
+          {/* Product? Details */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
-              <p className="text-lg text-gray-600 mt-1">By {product.vendorName}</p>
+              <h1 className="text-3xl font-bold text-gray-900">{product?.name}</h1>
+              <p className="text-lg text-gray-600 mt-1">By {product?.vendorName}</p>
               
               {/* Ratings */}
               <div className="flex items-center mt-2">
@@ -123,27 +91,27 @@ const ProductDetail = () => {
                     <Star 
                       key={i}
                       className={`h-5 w-5 ${
-                        i < Math.floor(product.rating) 
+                        i < Math.floor(product?.rating) 
                           ? "text-yellow-400 fill-yellow-400" 
-                          : i < product.rating 
+                          : i < product?.rating 
                             ? "text-yellow-400 fill-yellow-400 opacity-50" 
                             : "text-gray-300"
                       }`}
                     />
                   ))}
                 </div>
-                <span className="ml-2 text-gray-600">({product.reviews.length} reviews)</span>
+                <span className="ml-2 text-gray-600">({8} reviews)</span>
               </div>
             </div>
             
-            <div className="text-2xl font-bold text-gray-900">${product.price.toFixed(2)}</div>
+            <div className="text-2xl font-bold text-gray-900">${product?.price}</div>
             
-            <p className="text-gray-700">{product.description}</p>
+            <p className="text-gray-700">{product?.description}</p>
             
             <div className="flex items-center space-x-2">
               <div className="text-gray-700">Availability:</div>
-              {product.stock > 0 ? (
-                <div className="text-green-600">In Stock ({product.stock} available)</div>
+              {product?.stock > 0 ? (
+                <div className="text-green-600">In Stock ({product?.stock} available)</div>
               ) : (
                 <div className="text-red-600">Out of Stock</div>
               )}
@@ -164,7 +132,7 @@ const ProductDetail = () => {
                 <button 
                   className="px-3 py-1 text-gray-600 hover:bg-gray-100" 
                   onClick={incrementQuantity}
-                  disabled={quantity >= product.stock}
+                  disabled={quantity >= product?.stock}
                 >
                   <Plus className="h-4 w-4" />
                 </button>
@@ -176,7 +144,7 @@ const ProductDetail = () => {
               size="lg" 
               className="w-full sm:w-auto"
               onClick={handleAddToCart}
-              disabled={product.stock === 0}
+              disabled={product?.stock === 0}
             >
               <ShoppingCart className="mr-2 h-5 w-5" />
               Add to Cart
@@ -187,30 +155,30 @@ const ProductDetail = () => {
               <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
                 <div>
                   <dt className="text-gray-500">Category</dt>
-                  <dd className="mt-1 text-gray-900">{product.category}</dd>
+                  <dd className="mt-1 text-gray-900">{product?.category}</dd>
                 </div>
                 <div>
                   <dt className="text-gray-500">Vendor</dt>
-                  <dd className="mt-1 text-gray-900">{product.vendorName}</dd>
+                  <dd className="mt-1 text-gray-900">{product?.vendorName}</dd>
                 </div>
               </dl>
             </div>
           </div>
         </div>
         
-        {/* Product Tabs (Description, Reviews) */}
+        {/* Product? Tabs (Description, Reviews) */}
         <div className="mt-16">
           <Tabs defaultValue="reviews">
             <TabsList className="w-full">
               <TabsTrigger value="description" className="flex-1">Description</TabsTrigger>
-              <TabsTrigger value="reviews" className="flex-1">Reviews ({product.reviews.length})</TabsTrigger>
+              <TabsTrigger value="reviews" className="flex-1">Reviews ({8})</TabsTrigger>
             </TabsList>
             
             <TabsContent value="description" className="mt-6">
               <Card className="p-6">
                 <div className="prose max-w-none">
                   <h3>Product Description</h3>
-                  <p>{product.description}</p>
+                  <p>{product?.description}</p>
                   <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu semper justo. Duis volutpat, nibh at volutpat commodo, eros quam tincidunt orci, a pretium velit nulla in ipsum. Aliquam venenatis lacus lacus, et efficitur dui cursus non.</p>
                   <h4>Features</h4>
                   <ul>
@@ -228,28 +196,28 @@ const ProductDetail = () => {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-medium">Customer Reviews</h3>
-                    <span className="flex items-center">
+                    {/* <span className="flex items-center">
                       {[...Array(5)].map((_, i) => (
                         <Star 
                           key={i}
                           className={`h-5 w-5 ${
-                            i < Math.floor(product.rating) 
+                            i < Math.floor(product?.rating) 
                               ? "text-yellow-400 fill-yellow-400" 
-                              : i < product.rating 
+                              : i < product?.rating 
                                 ? "text-yellow-400 fill-yellow-400 opacity-50" 
                                 : "text-gray-300"
                           }`}
                         />
                       ))}
-                      <span className="ml-2 text-gray-600">{product.rating.toFixed(1)} out of 5</span>
-                    </span>
+                      <span className="ml-2 text-gray-600">{product?.rating.toFixed(1)} out of 5</span>
+                    </span> */}
                   </div>
                   
                   <Separator />
                   
                   {/* Review List */}
-                  <div className="space-y-6">
-                    {product.reviews.map((review) => (
+                  {/* <div className="space-y-6">
+                    {product?.reviews.map((review) => (
                       <div key={review.id} className="space-y-2">
                         <div className="flex justify-between">
                           <span className="font-medium">{review.user}</span>
@@ -268,7 +236,7 @@ const ProductDetail = () => {
                         <Separator />
                       </div>
                     ))}
-                  </div>
+                  </div> */}
                   
                   {/* Add Review Button */}
                   <div className="text-center pt-4">

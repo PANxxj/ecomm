@@ -30,7 +30,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
         //   vendorId,
         //   searchd: searchTerm
         // });
-        const data = await ProductApi.allProducts()
+        const data = await ProductApi.allProducts(searchTerm,category)
         
         // Apply limit if specified
         const limitedData = limit ? data.data.result.slice(0, limit) : data.data.result;
