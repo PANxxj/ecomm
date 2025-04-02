@@ -262,7 +262,7 @@ const VendorProducts = () => {
   const getProducts = async()=>{
     try{
 
-      const res = await ProductApi.allProducts()
+      const res = await ProductApi.allProducts('','')
       setProducts(res.data.result)
       setFilteredProducts(res.data.result)
     }catch(error){
