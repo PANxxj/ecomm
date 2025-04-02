@@ -1,7 +1,8 @@
 // axiosInstance.js
 import axios from "axios";
 
-const url = 'http://139.5.189.24:8909/api/v1/'
+const url = '/api/v1/'
+// const url = 'http://139.5.189.24:8909/api/v1/'1
 
 const instance = axios.create({
     baseURL: url,
